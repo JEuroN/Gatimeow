@@ -222,6 +222,7 @@
   width: 50px;
   border-radius: 50px;
   align-self: center;
+  cursor: pointer;
 }
 
 .card-container {

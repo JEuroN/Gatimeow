@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react'
 import Random from './Random'
 import Search from './Search'
 import axios from 'axios';
-import {url} from '../../setUrl'
 import '../../App.css'
 import logoutIcon from '../../Assets/logout.png'
 
@@ -25,20 +24,19 @@ const Dash = ({setTab}) => {
 
     const [album, setAlbum] = useState([...filter(gatos)]);
     
-    const handleAmount = (MoreOrLess, request) => {
+    const handleAmount = (MoreOrLess) => {
         if(MoreOrLess) {
             if(gatos.length - amount !== 0)
             setAmount(amount+30);
-            if(gatos.length - amount <= 90)
-                getMoreCats(request);
+            if(gatos.length - amount <= 30)
+                searchGato();
         }else if(amount > 0){
             setAmount(amount-30);
         }
     }
 
     const searchGato = () => {
-        let dir = url.localhost + '/dash';
-        axios.get(dir, {
+        axios.get('https://api.thecatapi.com/v1/images/search?limit=90&api_key=8fab3387-2c85-41e2-9677-148f9debde90', {
             method: 'GET',
             headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
             credentials: 'include',
@@ -46,34 +44,16 @@ const Dash = ({setTab}) => {
     })
     .then((r)=>{
         console.log(r);
-        setGatos([...gatos, ...r.data.msg]);
+        setGatos([...gatos, ...r.data]);
     })
     .catch((r)=>{
         console.log(r);
     })
     }
 
-    const getMoreCats = (request) => {
-        let dir = url.localhost + '/getGatos';
-        axios.post(dir, {
-            method: 'POST',
-            data: request,
-            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-            credentials: 'include',
-            mode: 'cors'
-        })
-        .then((r)=>{
-            console.log(r.data.msg);
-            setGatos([...gatos, ...r.data.msg]);
-        })
-        .catch((r)=>{
-            console.log(r);
-        })
-    }
-
     useEffect(() => {
         let username = JSON.parse(localStorage.getItem('SESSION'));
-        setName(username.profileObj.givenName);
+        setName(username.givenName);
         searchGato();
     }, [])
 

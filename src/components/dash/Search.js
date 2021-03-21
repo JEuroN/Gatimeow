@@ -26,11 +26,12 @@ const Search = ({filter}) => {
 
     const handleAmount = (MoreOrLess) => {
         if(MoreOrLess) {
-            console.log(gatos.length - (amount+4))
-            if(gatos.length - (amount+4) > 0)
-                setAmount(amount+4);
+            if(gatos.length - amount !== 0)
+            setAmount(amount+30);
+            if(gatos.length - amount <= 30)
+                searchGato();
         }else if(amount > 0){
-            setAmount(amount-4);
+            setAmount(amount-30);
         }
     }
 
@@ -39,28 +40,41 @@ const Search = ({filter}) => {
         setNewAlbum([...filter(gatos, amount)]);
     }, [amount, gatos])
 
-    const searchGato = (method) => {
+    const searchGato = async () => {
         setSearching(true);
         let obj = {...search};
+        let result;
         if(obj.opt === 1 || obj.opt === 0 || obj.filter === 'No selected'){
             console.log('No se ha seleccionado nada')
+        }else if(obj.opt === 2){
+            result = await searchGatosByBreed(obj.filter)
+            setAmount(0);
+            setGatos([...result])
         }else{
-            axios.post(url.localhost + '/getGatos', {
-                method: 'POST',
-                data: obj,
-                headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-                credentials: 'include',
-                mode: 'cors'
-            })
-            .then((r)=>{
-                console.log(r);
-                setAmount(0);
-                setGatos([...r.data.msg])
-            })
-            .catch((r)=>{
-                console.log(r);
-            })
+            result = await searchGatosByCategory(obj.filter)
+            setAmount(0)
+            setGatos([...result])
         }
+    }
+
+    const searchGatosByBreed = async (breed) => {
+        return await axios.get(`https://api.thecatapi.com/v1/images/search?breed_ids=${breed}&limit=90&api_key=8fab3387-2c85-41e2-9677-148f9debde90`)
+        .then((r)=>{
+            return r.data;
+        })
+        .catch((r)=>{
+            return false;
+        })
+    }
+    
+    const searchGatosByCategory = async (category) => {
+        return await axios.get(`https://api.thecatapi.com/v1/images/search?category_ids=${category}&limit=90&api_key=8fab3387-2c85-41e2-9677-148f9debde90`)
+        .then((r)=>{
+            return r.data;
+        })
+        .catch((r)=>{
+            return false;
+        })
     }
 
     useEffect(()=>{

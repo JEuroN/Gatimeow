@@ -1,7 +1,5 @@
 import React from 'react'
 import GoogleLogin from 'react-google-login'
-import axios from 'axios';
-import {url} from '../../setUrl'
 import gatiLogo from '../../Assets/gatimeow.png'
 import '../../App.css'
 import google from '../../Assets/google_signin_buttons/android/hdpi/btn_google_signin_light_normal_hdpi.9.png'
@@ -9,25 +7,12 @@ import google from '../../Assets/google_signin_buttons/android/hdpi/btn_google_s
 const Login = ({setTab}) => {
 
     const successLogin = (res) =>{
-        const {profileObj, tokenId} = res;
-        console.log(res);
-        let dir = url.localhost + '/login'
-        axios.post(dir, {
-            method: 'POST',
-            data: profileObj,
-            headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorize': tokenId},
-            credentials: 'include',
-            mode: 'cors'
-        })
-        .then((srvRes)=>{
-            if(srvRes.status === 200){
-                localStorage.setItem('SESSION', JSON.stringify(res))
-                setTab(false);
-            }
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
+        const {profileObj} = res;
+        console.log(profileObj)
+        if(profileObj !== undefined){
+            localStorage.setItem('SESSION', JSON.stringify(profileObj))
+            setTab(false);
+        }
     }
 
     const failedLogin = (res) =>{
